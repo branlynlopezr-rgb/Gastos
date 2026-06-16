@@ -16,7 +16,7 @@ interface OverviewPageProps {
 
 export function OverviewPage({ greeting, onNavigate }: OverviewPageProps) {
   const firstName = DEMO_USER.name.split(' ')[0]
-  const { dashboard, loading, error } = useData()
+  const { dashboard, loading, error, dbWarning } = useData()
 
   return (
     <div className="mx-auto flex max-w-[1400px] flex-col gap-10">
@@ -44,12 +44,15 @@ export function OverviewPage({ greeting, onNavigate }: OverviewPageProps) {
         </div>
       </header>
 
+      {dbWarning && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-5 py-4 text-sm text-amber-700 dark:text-amber-300">
+          {dbWarning}
+        </div>
+      )}
+
       {error && (
         <div className="rounded-xl border border-vh-danger/30 bg-vh-danger/10 px-5 py-4 text-sm text-vh-danger">
           {error}
-          <p className="mt-1 text-xs opacity-80">
-            Inicia el servidor: <code className="font-mono">npm run server</code>
-          </p>
         </div>
       )}
 

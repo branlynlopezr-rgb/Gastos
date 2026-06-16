@@ -1,9 +1,13 @@
-import type { CreateTransactionInput } from '../../src/types/transaction.js'
-import { buildDashboardSummary } from '../dashboard.js'
-import { getDb } from '../db/index.js'
+import type { CreateTransactionInput } from '../src/types/transaction.js'
+import { buildDashboardSummary } from './dashboard.js'
+import { getDb, getDbStatus } from './db/index.js'
 
 export async function getHealth() {
-  return { ok: true, message: 'API Gastos - VitalHood activa' }
+  return {
+    ok: true,
+    message: 'API Gastos - VitalHood activa',
+    db: getDbStatus(),
+  }
 }
 
 export async function getTransactions() {

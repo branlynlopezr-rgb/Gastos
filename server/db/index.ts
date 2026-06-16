@@ -1,20 +1,18 @@
 import type { DbAdapter } from './types.js'
-import { createLocalDb } from './local.js'
-import { createTursoDb } from './turso.js'
+import { createEmptyDb, hasTursoCredentials } from './empty.js'
 
 let adapter: DbAdapter | null = null
 
-/** Vercel = Turso. Local = SQLite en archivo. */
 export async function getDb(): Promise<DbAdapter> {
   if (adapter) return adapter
 
-  if (process.env.TURSO_DATABASE_URL) {
+  if (hasTursoCredentials()) {
+    const { createTursoDb } = await import('./turso.js')
     adapter = await createTursoDb()
   } else if (process.env.VERCEL) {
-    throw new Error(
-      'Configura TURSO_DATABASE_URL y TURSO_AUTH_TOKEN en Vercel → Settings → Environment Variables.',
-    )
+    adapter = createEmptyDb()
   } else {
+    const { createLocalDb } = await import('./local.js')
     adapter = await createLocalDb()
   }
 
@@ -23,4 +21,10 @@ export async function getDb(): Promise<DbAdapter> {
 
 export async function resetDbCache() {
   adapter = null
+}
+
+export function getDbStatus() {
+  if (hasTursoCredentials()) return 'turso'
+  if (process.env.VERCEL) return 'none'
+  return 'local'
 }

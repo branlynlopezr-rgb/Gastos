@@ -20,7 +20,7 @@ function todayISO() {
 }
 
 export function ManagePage() {
-  const { transactions, loading, error, refresh } = useData()
+  const { transactions, loading, error, dbWarning, refresh } = useData()
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
@@ -88,17 +88,19 @@ export function ManagePage() {
           Registrar movimientos
         </h1>
         <p className="mt-2 text-sm text-vh-muted sm:text-base">
-          Sube tus gastos e ingresos. Se guardan en la base de datos SQLite
-          local del proyecto.
+          Sube tus gastos e ingresos. En producción se guardan en Turso (SQLite en la nube).
         </p>
       </header>
+
+      {dbWarning && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-300">
+          {dbWarning}
+        </div>
+      )}
 
       {error && (
         <div className="rounded-xl border border-vh-danger/30 bg-vh-danger/10 px-4 py-3 text-sm text-vh-danger">
           {error}
-          <p className="mt-1 text-xs opacity-80">
-            Ejecuta en otra terminal: <code className="font-mono">npm run server</code>
-          </p>
         </div>
       )}
 
