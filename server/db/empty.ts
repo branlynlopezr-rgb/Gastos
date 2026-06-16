@@ -1,4 +1,4 @@
-import type { CreateTransactionInput, Transaction } from '../../src/types/transaction.js'
+import type { CreateTransactionInput } from '../../src/types/transaction.js'
 import type { DbAdapter } from './types.js'
 
 /** Solo lectura vacía cuando no hay BD configurada en Vercel */
@@ -12,7 +12,7 @@ export function createEmptyDb(): DbAdapter {
     },
     async createTransaction(_input: CreateTransactionInput) {
       throw new Error(
-        'Base de datos no configurada. Agrega TURSO_DATABASE_URL y TURSO_AUTH_TOKEN en Vercel → Settings → Environment Variables.',
+        'Base de datos no configurada. Agrega link y service_role (Supabase) en Vercel → Environment Variables.',
       )
     },
     async deleteTransaction() {
@@ -24,11 +24,8 @@ export function createEmptyDb(): DbAdapter {
   }
 }
 
-export function hasTursoCredentials(): boolean {
-  const url = process.env.TURSO_DATABASE_URL
-  if (!url) return false
-  if (url.startsWith('libsql://') || url.startsWith('https://')) {
-    return Boolean(process.env.TURSO_AUTH_TOKEN)
-  }
-  return true
+export function hasSupabaseCredentials(): boolean {
+  const url = process.env.link ?? process.env.SUPABASE_URL
+  const serviceKey = process.env.service_role ?? process.env.SUPABASE_SERVICE_ROLE_KEY
+  return Boolean(url && serviceKey)
 }

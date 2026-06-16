@@ -88,7 +88,7 @@ export function ManagePage() {
           Registrar movimientos
         </h1>
         <p className="mt-2 text-sm text-vh-muted sm:text-base">
-          Sube tus gastos e ingresos. En producción se guardan en Turso (SQLite en la nube).
+          Sube tus gastos e ingresos. Se guardan en tu base de datos Supabase.
         </p>
       </header>
 

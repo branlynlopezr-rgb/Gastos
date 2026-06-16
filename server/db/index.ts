@@ -1,14 +1,14 @@
 import type { DbAdapter } from './types.js'
-import { createEmptyDb, hasTursoCredentials } from './empty.js'
+import { createEmptyDb, hasSupabaseCredentials } from './empty.js'
 
 let adapter: DbAdapter | null = null
 
 export async function getDb(): Promise<DbAdapter> {
   if (adapter) return adapter
 
-  if (hasTursoCredentials()) {
-    const { createTursoDb } = await import('./turso.js')
-    adapter = await createTursoDb()
+  if (hasSupabaseCredentials()) {
+    const { createSupabaseDb } = await import('./supabase.js')
+    adapter = await createSupabaseDb()
   } else if (process.env.VERCEL) {
     adapter = createEmptyDb()
   } else {
@@ -24,7 +24,7 @@ export async function resetDbCache() {
 }
 
 export function getDbStatus() {
-  if (hasTursoCredentials()) return 'turso'
+  if (hasSupabaseCredentials()) return 'supabase'
   if (process.env.VERCEL) return 'none'
   return 'local'
 }
