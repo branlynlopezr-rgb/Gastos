@@ -1,77 +1,100 @@
 # Gastos - VitalHood
 
-Dashboard de gestión de gastos con **base de datos SQLite** local.
+Dashboard de gestión de gastos. Frontend React + API serverless + SQLite (local) / Turso (producción).
 
 ## Stack
 
-- **Frontend:** React 19 + TypeScript + Vite + Tailwind CSS 4
-- **Backend:** Express + SQLite (sql.js, sin compilación nativa)
-- **BD:** archivo local `data/gastos.db`
+| Capa | Tecnología |
+|------|------------|
+| Frontend | React 19 + Vite + Tailwind CSS 4 |
+| API local | Express (puerto 3001) |
+| API producción | Vercel Serverless Functions (`/api`) |
+| BD local | SQLite (`data/gastos.db`) |
+| BD producción | [Turso](https://turso.tech) (SQLite en la nube) |
 
-## Inicio rápido
+---
 
-### 1. Instalar dependencias
+## Desarrollo local
 
 ```cmd
 npm install
-```
-
-### 2. Iniciar todo (API + frontend)
-
-```cmd
 npm run dev:all
-```
-
-O en **dos terminales**:
-
-```cmd
-npm run server
-npm run dev
 ```
 
 Abre **http://localhost:5173**
 
-## Registrar gastos e ingresos
+---
 
-1. Ve a la pestaña **Gestionar** (o clic en **Registrar gasto / ingreso** en Resumen)
-2. Elige **Gasto** o **Ingreso**
-3. Completa descripción, monto, fecha y categoría
-4. Clic en **Registrar**
+## Deploy en Vercel + GitHub
 
-Los datos se guardan en SQLite y el **Resumen** se actualiza automáticamente.
+### 1. Subir código a GitHub
 
-## API REST
-
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| GET | `/api/transactions` | Listar movimientos |
-| POST | `/api/transactions` | Crear gasto/ingreso |
-| DELETE | `/api/transactions/:id` | Eliminar movimiento |
-| GET | `/api/dashboard` | Resumen para el dashboard |
-
-## Estructura
-
+```cmd
+git add .
+git commit -m "Preparar deploy Vercel"
+git push origin main
 ```
-server/           → API Express + SQLite
-data/gastos.db    → Base de datos (se crea automáticamente)
-src/
-  pages/ManagePage.tsx    → Formulario de registro
-  context/DataProvider.tsx → Conexión frontend ↔ API
-  components/dashboard/   → Tarjetas del resumen
-```
+
+Repositorio: `https://github.com/branlynlopezr-rgb/Gastos`
+
+### 2. Importar en Vercel
+
+1. Entra a [vercel.com](https://vercel.com) → **Add New Project**
+2. Importa el repo **Gastos** desde GitHub
+3. Vercel detecta **Vite** automáticamente (usa `vercel.json`)
+4. **Deploy** (el frontend funcionará; la API necesita Turso)
+
+### 3. Crear base de datos Turso (gratis)
+
+1. Crea cuenta en [turso.tech](https://turso.tech)
+2. Crea una base de datos nueva (ej: `gastos-vitalhood`)
+3. Copia **Database URL** y **Auth Token**
+
+### 4. Variables de entorno en Vercel
+
+En tu proyecto Vercel → **Settings → Environment Variables**:
+
+| Variable | Valor |
+|----------|-------|
+| `TURSO_DATABASE_URL` | `libsql://tu-db.turso.io` |
+| `TURSO_AUTH_TOKEN` | token de Turso |
+
+Aplica a **Production**, **Preview** y **Development**. Luego **Redeploy**.
+
+### 5. Verificar
+
+- Frontend: `https://tu-proyecto.vercel.app`
+- API health: `https://tu-proyecto.vercel.app/api/health`
+- Dashboard: `https://tu-proyecto.vercel.app/api/dashboard`
+
+---
 
 ## Scripts
 
 | Comando | Descripción |
 |---------|-------------|
 | `npm run dev` | Solo frontend |
-| `npm run server` | Solo API (puerto 3001) |
-| `npm run dev:all` | Frontend + API juntos |
+| `npm run server` | Solo API local |
+| `npm run dev:all` | Frontend + API local |
+| `npm run build` | Build producción |
+| `npm run db:reset` | Limpiar BD local |
 
-## Nota PowerShell
+---
 
-Si `npm` falla por política de scripts, usa:
+## Estructura
 
-```powershell
-.\npm.cmd run dev:all
 ```
+api/                 → Serverless functions (Vercel)
+server/              → Lógica API + adaptadores BD
+src/                 → Frontend React
+vercel.json          → Config deploy
+data/gastos.db       → BD local (no se sube a Git)
+```
+
+---
+
+## Notas
+
+- **Local:** usa SQLite en archivo, sin configuración extra.
+- **Vercel:** requiere Turso (SQLite serverless). Sin esas variables, la API devuelve error explicativo.
+- Cuando conectes otra BD (PostgreSQL, etc.), reemplaza `server/db/turso.ts`.
