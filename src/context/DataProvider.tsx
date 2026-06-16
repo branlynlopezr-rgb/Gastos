@@ -39,6 +39,23 @@ export function DataProvider({ children }: { children: ReactNode }) {
     try {
       const health = await api.getHealth().catch(() => null)
 
+      if (health && !health.ok && health.message) {
+        setError(health.message)
+        setDashboard({
+          balance: 0,
+          totalIncome: 0,
+          totalExpense: 0,
+          netRevenue: 0,
+          earnings: 0,
+          spendingLimit: EMPTY_DASHBOARD.spendingLimit,
+          chartMonths: EMPTY_DASHBOARD.chartMonths,
+          recentActivities: [],
+          quickStats: EMPTY_DASHBOARD.quickStats,
+        })
+        setTransactions([])
+        return
+      }
+
       if (health?.db === 'none') {
         setDbWarning(
           'Base de datos no configurada. Agrega link y service_role de Supabase en Vercel → Environment Variables, luego redeploy.',

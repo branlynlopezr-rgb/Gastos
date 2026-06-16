@@ -1,13 +1,26 @@
 import type { CreateTransactionInput } from '../src/types/transaction.js'
 import { buildDashboardSummary } from './dashboard.js'
 import { getDb, getDbStatus } from './db/index.js'
+import { pingSupabase } from './db/supabase.js'
 
 export async function getHealth() {
-  return {
+  const db = getDbStatus()
+  const result: Record<string, unknown> = {
     ok: true,
     message: 'API Gastos - VitalHood activa',
-    db: getDbStatus(),
+    db,
   }
+
+  if (db === 'supabase') {
+    const ping = await pingSupabase()
+    result.supabase = ping
+    if (!ping.ok) {
+      result.ok = false
+      result.message = ping.detail
+    }
+  }
+
+  return result
 }
 
 export async function getTransactions() {

@@ -22,7 +22,12 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
 
 export const api = {
   getHealth: () =>
-    request<{ ok: boolean; message: string; db: string }>('/health'),
+    request<{
+      ok: boolean
+      message: string
+      db: string
+      supabase?: { ok: boolean; detail?: string }
+    }>('/health'),
   getDashboard: () => request<DashboardSummary>('/dashboard'),
   getTransactions: () => request<Transaction[]>('/transactions'),
   createTransaction: (data: CreateTransactionInput) =>
