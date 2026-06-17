@@ -1,3 +1,4 @@
+import { Loader2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { OverviewPage } from '@/pages/OverviewPage'
@@ -28,9 +29,17 @@ function PlaceholderPage({ title }: { title: string }) {
 }
 
 export default function App() {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, isLoading } = useAuth()
   const [activeTab, setActiveTab] = useState<NavTab>('overview')
   const greeting = useMemo(() => getGreeting(), [])
+
+  if (isLoading) {
+    return (
+      <div className="auth-shell flex min-h-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-indigo-600" aria-label="Cargando sesión" />
+      </div>
+    )
+  }
 
   if (!isAuthenticated) {
     return <AuthPage />
