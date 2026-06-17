@@ -1,32 +1,26 @@
 import { createClient } from '@supabase/supabase-js'
 import type { CreateTransactionInput, Transaction } from '../../src/types/transaction.js'
+import {
+  getSupabaseServiceRole,
+  getSupabaseUrl,
+} from './env.js'
 import type { DbAdapter } from './types.js'
 
-function readEnv(...keys: string[]): string | undefined {
-  for (const key of keys) {
-    const value = process.env[key]?.trim()
-    if (value) return value
-  }
-  return undefined
-}
+export { hasSupabaseCredentials } from './env.js'
 
 export function getSupabaseConfig() {
-  const url = readEnv('link', 'LINK', 'SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_URL')
-  const serviceKey = readEnv(
-    'service_role',
-    'SERVICE_ROLE',
-    'SUPABASE_SERVICE_ROLE_KEY',
-  )
+  const url = getSupabaseUrl()
+  const serviceKey = getSupabaseServiceRole()
 
   if (!url || !serviceKey) {
     throw new Error(
-      'Faltan variables link y service_role en Vercel. Revisa Settings → Environment Variables y haz Redeploy.',
+      'Faltan variables Link y service_role en Vercel. Revisa Settings → Environment Variables y haz Redeploy.',
     )
   }
 
   if (!url.startsWith('https://') || !url.includes('supabase')) {
     throw new Error(
-      `link debe ser la Project URL de Supabase (https://xxx.supabase.co). Valor actual empieza con: ${url.slice(0, 30)}...`,
+      `Link debe ser la Project URL de Supabase (https://xxx.supabase.co). Valor actual empieza con: ${url.slice(0, 30)}...`,
     )
   }
 
@@ -51,15 +45,6 @@ function mapRow(row: Record<string, unknown>): Transaction {
     category: String(row.category),
     date: date.includes('T') ? date.slice(0, 10) : date,
     created_at: createdAt,
-  }
-}
-
-export function hasSupabaseCredentials(): boolean {
-  try {
-    getSupabaseConfig()
-    return true
-  } catch {
-    return false
   }
 }
 

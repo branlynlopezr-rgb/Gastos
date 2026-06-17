@@ -58,7 +58,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
       if (health?.db === 'none') {
         setDbWarning(
-          'Base de datos no configurada. Agrega link y service_role de Supabase en Vercel → Environment Variables, luego redeploy.',
+          'Base de datos no configurada. Agrega Link y service_role de Supabase en Vercel → Environment Variables, luego redeploy.',
         )
         setDashboard({
           balance: 0,
@@ -87,7 +87,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
       if (IS_PRODUCTION) {
         setError(
-          `Error de API en producción: ${msg}. Verifica el deploy en Vercel y las variables link / service_role de Supabase.`,
+          `Error de API en producción: ${msg}. Verifica el deploy en Vercel y las variables Link / service_role de Supabase.`,
         )
       } else {
         setError(`${msg}. Ejecuta: npm run dev:all`)

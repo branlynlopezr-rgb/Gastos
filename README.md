@@ -6,9 +6,9 @@ Dashboard de gestión de gastos. React + Vercel + **Supabase (PostgreSQL)**.
 
 | Variable | Valor (Supabase → Settings → API) |
 |----------|-----------------------------------|
-| `link` | Project URL (`https://xxx.supabase.co`) |
+| `Link` | Project URL (`https://xxx.supabase.co`) |
 | `service_role` | service_role secret key |
-| `anon_public` | anon public key (reservado para auth futuro) |
+| `Anon_Public` | anon public key (reservado para auth futuro) |
 
 ## SQL — crear tablas en Supabase
 
