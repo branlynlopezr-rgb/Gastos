@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react'
-import { Bell, ChevronDown, Info, Moon, Search, Sun } from 'lucide-react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { Bell, ChevronDown, Info, LogOut, Moon, Search, Sun } from 'lucide-react'
 import { useTheme } from '@/context/ThemeProvider'
 import { useAuth } from '@/context/AuthProvider'
 import { NAV_TABS, type NavTab } from '@/config/navigation'
@@ -19,10 +19,38 @@ interface TopBarProps {
 
 export function TopBar({ activeTab, onTabChange }: TopBarProps) {
   const { theme, toggleTheme } = useTheme()
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
   const displayName = user?.name ?? 'Usuario'
   const displayEmail = user?.email ?? ''
   const initials = user ? initialsFromName(user.name) : 'VH'
+
+  useEffect(() => {
+    if (!menuOpen) return
+
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenuOpen(false)
+      }
+    }
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') setMenuOpen(false)
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('keydown', handleEscape)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [menuOpen])
+
+  function handleLogout() {
+    setMenuOpen(false)
+    logout()
+  }
 
   return (
     <header className="sticky top-0 z-20 border-b border-vh-border bg-vh-bg/90 backdrop-blur-md transition-colors">
@@ -86,21 +114,54 @@ export function TopBar({ activeTab, onTabChange }: TopBarProps) {
             )}
           </IconButton>
 
-          <button
-            type="button"
-            className="ml-1 flex items-center gap-2 rounded-2xl bg-vh-surface px-2 py-1.5 shadow-vh-card transition-all hover:shadow-vh-soft active:scale-[0.98] sm:gap-3"
-          >
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-vh-primary/15 text-sm font-semibold text-vh-primary">
-              {initials}
-            </div>
-            <div className="hidden text-left sm:block">
-              <p className="text-sm font-medium leading-tight text-vh-text">
-                {displayName}
-              </p>
-              <p className="text-xs text-vh-muted">{displayEmail}</p>
-            </div>
-            <ChevronDown className="hidden h-4 w-4 text-vh-muted sm:block" />
-          </button>
+          <div className="relative" ref={menuRef}>
+            <button
+              type="button"
+              onClick={() => setMenuOpen((open) => !open)}
+              aria-expanded={menuOpen}
+              aria-haspopup="menu"
+              className="ml-1 flex items-center gap-2 rounded-2xl bg-vh-surface px-2 py-1.5 shadow-vh-card transition-all hover:shadow-vh-soft active:scale-[0.98] sm:gap-3"
+            >
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-vh-primary/15 text-sm font-semibold text-vh-primary">
+                {initials}
+              </div>
+              <div className="hidden text-left sm:block">
+                <p className="text-sm font-medium leading-tight text-vh-text">
+                  {displayName}
+                </p>
+                <p className="max-w-[140px] truncate text-xs text-vh-muted lg:max-w-[180px]">
+                  {displayEmail}
+                </p>
+              </div>
+              <ChevronDown
+                className={[
+                  'hidden h-4 w-4 text-vh-muted transition-transform sm:block',
+                  menuOpen ? 'rotate-180' : '',
+                ].join(' ')}
+              />
+            </button>
+
+            {menuOpen && (
+              <div
+                role="menu"
+                className="absolute right-0 top-[calc(100%+0.5rem)] z-50 min-w-[220px] overflow-hidden rounded-2xl border border-vh-border bg-vh-surface shadow-vh-hover"
+              >
+                <div className="border-b border-vh-border px-4 py-3 sm:hidden">
+                  <p className="text-sm font-medium text-vh-text">{displayName}</p>
+                  <p className="truncate text-xs text-vh-muted">{displayEmail}</p>
+                </div>
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={handleLogout}
+                  className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-vh-danger transition-colors hover:bg-red-500/10"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Cerrar sesión
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
