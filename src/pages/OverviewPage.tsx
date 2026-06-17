@@ -1,5 +1,5 @@
 import { Loader2, Plus } from 'lucide-react'
-import { DEMO_USER } from '@/config/navigation'
+import { useAuth } from '@/context/AuthProvider'
 import { useData } from '@/context/DataProvider'
 import { BalanceCard } from '@/components/dashboard/BalanceCard'
 import { IncomeChart } from '@/components/dashboard/IncomeChart'
@@ -15,7 +15,8 @@ interface OverviewPageProps {
 }
 
 export function OverviewPage({ greeting, onNavigate }: OverviewPageProps) {
-  const firstName = DEMO_USER.name.split(' ')[0]
+  const { user } = useAuth()
+  const firstName = user?.name.split(' ')[0] ?? 'Usuario'
   const { dashboard, loading, error, dbWarning } = useData()
 
   return (

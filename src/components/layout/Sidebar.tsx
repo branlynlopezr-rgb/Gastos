@@ -11,6 +11,7 @@ import {
   Users,
 } from 'lucide-react'
 import { useTheme } from '@/context/ThemeProvider'
+import { useAuth } from '@/context/AuthProvider'
 import { SIDEBAR_ITEMS, type SidebarItem } from '@/config/navigation'
 
 const ICONS = {
@@ -28,6 +29,7 @@ interface SidebarProps {
 
 export function Sidebar({ activeItem = 'dashboard' }: SidebarProps) {
   const { theme, toggleTheme } = useTheme()
+  const { logout } = useAuth()
 
   return (
     <aside className="hidden w-[72px] shrink-0 flex-col items-center border-r border-vh-border bg-vh-surface py-5 transition-colors md:flex">
@@ -83,6 +85,7 @@ export function Sidebar({ activeItem = 'dashboard' }: SidebarProps) {
           type="button"
           title="Cerrar sesión"
           aria-label="Cerrar sesión"
+          onClick={logout}
           className="flex h-11 w-11 items-center justify-center rounded-xl text-vh-muted transition-all hover:scale-105 hover:bg-red-500/10 hover:text-vh-danger active:scale-95"
         >
           <LogOut className="h-5 w-5" />

@@ -1,7 +1,16 @@
 import type { ReactNode } from 'react'
 import { Bell, ChevronDown, Info, Moon, Search, Sun } from 'lucide-react'
 import { useTheme } from '@/context/ThemeProvider'
-import { DEMO_USER, NAV_TABS, type NavTab } from '@/config/navigation'
+import { useAuth } from '@/context/AuthProvider'
+import { NAV_TABS, type NavTab } from '@/config/navigation'
+
+function initialsFromName(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+  }
+  return name.slice(0, 2).toUpperCase()
+}
 
 interface TopBarProps {
   activeTab: NavTab
@@ -10,6 +19,10 @@ interface TopBarProps {
 
 export function TopBar({ activeTab, onTabChange }: TopBarProps) {
   const { theme, toggleTheme } = useTheme()
+  const { user } = useAuth()
+  const displayName = user?.name ?? 'Usuario'
+  const displayEmail = user?.email ?? ''
+  const initials = user ? initialsFromName(user.name) : 'VH'
 
   return (
     <header className="sticky top-0 z-20 border-b border-vh-border bg-vh-bg/90 backdrop-blur-md transition-colors">
@@ -78,13 +91,13 @@ export function TopBar({ activeTab, onTabChange }: TopBarProps) {
             className="ml-1 flex items-center gap-2 rounded-2xl bg-vh-surface px-2 py-1.5 shadow-vh-card transition-all hover:shadow-vh-soft active:scale-[0.98] sm:gap-3"
           >
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-vh-primary/15 text-sm font-semibold text-vh-primary">
-              {DEMO_USER.initials}
+              {initials}
             </div>
             <div className="hidden text-left sm:block">
               <p className="text-sm font-medium leading-tight text-vh-text">
-                {DEMO_USER.name}
+                {displayName}
               </p>
-              <p className="text-xs text-vh-muted">{DEMO_USER.email}</p>
+              <p className="text-xs text-vh-muted">{displayEmail}</p>
             </div>
             <ChevronDown className="hidden h-4 w-4 text-vh-muted sm:block" />
           </button>

@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { OverviewPage } from '@/pages/OverviewPage'
 import { ManagePage } from '@/pages/ManagePage'
+import { AuthPage } from '@/pages/AuthPage'
+import { useAuth } from '@/context/AuthProvider'
 import type { NavTab } from '@/config/navigation'
 
 function getGreeting(): string {
@@ -26,8 +28,13 @@ function PlaceholderPage({ title }: { title: string }) {
 }
 
 export default function App() {
+  const { isAuthenticated } = useAuth()
   const [activeTab, setActiveTab] = useState<NavTab>('overview')
   const greeting = useMemo(() => getGreeting(), [])
+
+  if (!isAuthenticated) {
+    return <AuthPage />
+  }
 
   const content = (() => {
     switch (activeTab) {
